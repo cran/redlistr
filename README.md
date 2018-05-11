@@ -23,9 +23,13 @@ Lastly, this is a work in progress and we aim to continually add new functions t
 Installation
 ------------
 
-Currently, `redlistr` can only be installed via GitHub, which requires the `devtools` package:
+`redlistr` is now on CRAN! You can also install the development version from GitHub.
 
 ``` r
-install.packages("devtools")
+# Easiest way to get redlistr:
+install.packages("redlistr")
+
+# For the development version from GitHub:
+# install.packages("devtools")
 devtools::install_github("red-list-ecosystem/redlistr")
 ```

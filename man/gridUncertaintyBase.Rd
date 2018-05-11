@@ -4,12 +4,13 @@
 \alias{gridUncertaintyBase}
 \title{Base function to compute AOO with grid uncertainty systematically}
 \usage{
-gridUncertaintyBase(ecosystem.data, grid.size, splits,
-  min.percent.rule = TRUE, percent = 1)
+gridUncertaintyBase(input.data, grid.size, splits, min.percent.rule = FALSE,
+  percent = 1, restriction = FALSE, min.grids.shift)
 }
 \arguments{
-\item{ecosystem.data}{Raster object of an ecosystem or species distribution.
-Please use a CRS with units measured in metres.}
+\item{input.data}{Object of an ecosystem or species distribution. Accepts either
+raster or spatial points formats. Please use a CRS with units measured in
+metres.}
 
 \item{grid.size}{A number specifying the width of the desired grid square (in
 same units as your coordinate reference system)}
@@ -21,6 +22,12 @@ must be passed before a grid is counted as an AOO grid.}
 
 \item{percent}{Numeric. The minimum percent to be applied as a threshold for
 the \code{min.percent.rule}.}
+
+\item{restriction}{Logical. If \code{TRUE}, allows user to specify areas to
+focus where grid search is done. Used in gridUncertaintyRestricted.}
+
+\item{min.grids.shift}{Dataframe object with two columns (x.shift and
+y.shift) specifying the coordinates to restrict the AOO grid placement.}
 }
 \value{
 List containing the following:
@@ -40,20 +47,15 @@ axes, adding a small amount of random movement (five percent of the
 \code{grid.size}) at each point. It then returns summary statistics for the
 range of AOOs calculated, and the RasterLayer(s) containing the grids with
 the minimum AOO. It is the base function which is used by
-\code{gridUncertainty} and \code{gridUncertaintySimulation}
-}
-\references{
-Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
-  Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
-  List of Ecosystems Categories and Criteria, Version 1.0. Gland,
-  Switzerland: IUCN. ix + 94pp. Available at the following web site:
-  \url{iucnrle.org/}
+\code{gridUncertainty}, \code{gridUncertaintySimulation}, and
+\code{gridUncertaintyRestricted}
 }
 \seealso{
 \code{\link{createGrid}} \code{\link{getAOOSilent}}
 
 Other gridUncertainty functions: \code{\link{gridUncertaintyRandomManual}},
   \code{\link{gridUncertaintyRandom}},
+  \code{\link{gridUncertaintyRestricted}},
   \code{\link{gridUncertaintySimulation}},
   \code{\link{gridUncertainty}}
 }

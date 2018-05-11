@@ -4,12 +4,13 @@
 \alias{gridUncertaintyRandomManual}
 \title{Manual function to compute AOO with grid uncertainty randomly}
 \usage{
-gridUncertaintyRandomManual(ecosystem.data, grid.size, n.sim = 10,
-  min.percent.rule = T, percent = 1)
+gridUncertaintyRandomManual(input.data, grid.size, n.sim = 10,
+  min.percent.rule = FALSE, percent = 1)
 }
 \arguments{
-\item{ecosystem.data}{Raster object of an ecosystem or species distribution.
-Please use a CRS with units measured in metres.}
+\item{input.data}{Object of an ecosystem or species distribution. Accepts either
+raster or spatial points formats. Please use a CRS with units measured in
+metres.}
 
 \item{grid.size}{A number specifying the width of the desired grid square (in
 same units as your coordinate reference system)}
@@ -40,18 +41,12 @@ axes, returning summary statistics for the range of AOOs calculated, and the
 RasterLayer(s) containing the grids with the minimum AOO. Requires manual
 input for the number of simulations to perform.
 }
-\references{
-Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
-  Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
-  List of Ecosystems Categories and Criteria, Version 1.0. Gland,
-  Switzerland: IUCN. ix + 94pp. Available at the following web site:
-  \url{iucnrle.org/}
-}
 \seealso{
 \code{\link{createGrid}} \code{\link{getAOOSilent}}
 
 Other gridUncertainty functions: \code{\link{gridUncertaintyBase}},
   \code{\link{gridUncertaintyRandom}},
+  \code{\link{gridUncertaintyRestricted}},
   \code{\link{gridUncertaintySimulation}},
   \code{\link{gridUncertainty}}
 }

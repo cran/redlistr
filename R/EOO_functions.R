@@ -2,10 +2,11 @@
 #'
 #' \code{makeEOO} creates a  minimum convex polygon enclosing all occurrences of
 #' the provided data
-#' @param ecosystem.data Raster object of an ecosystem or species distribution.
-#'   Please use a CRS with units measured in metres.
+#' @param input.data Object of an ecosystem or species distribution. Accepts either
+#'   raster or spatial points formats. Please use a CRS with units measured in
+#'   metres.
 #' @return An object of class SpatialPolygons representing the EOO of
-#'   \code{ecosystem.data}. Also inherits its CRS.
+#'   \code{input.data}. Also inherits its CRS.
 #' @author Nicholas Murray \email{murr.nick@@gmail.com}, Calvin Lee
 #'   \email{calvinkflee@@gmail.com}
 #' @family EOO functions
@@ -13,7 +14,7 @@
 #'   Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
 #'   List of Ecosystems Categories and Criteria, Version 1.0. Gland,
 #'   Switzerland: IUCN. ix + 94pp. Available at the following web site:
-#'   \url{iucnrle.org/}
+#'   \url{https://iucnrle.org/}
 #' @examples
 #' crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
 #' r1 <- raster(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
@@ -23,23 +24,19 @@
 #' @import sp
 #' @import raster
 
-makeEOO <- function (ecosystem.data){
-  # Makes an EOO spatial polygon using the centre point of each pixel as the boundary
-  EOO.points <- rasterToPoints(ecosystem.data)
+makeEOO <- function(input.data){
+  if(class(input.data) == "RasterLayer"){
+    # Makes an EOO spatial polygon using the centre point of each pixel as the boundary
+    EOO.points <- rasterToPoints(input.data)
+  } else EOO.points <- input.data@coords # accessing coordinates of shapefile
   if (nrow(EOO.points) <= 1) { # handling single pixels since chull fails for 1 pixel
-    EOO.polygon <- rasterToPolygons(ecosystem.data)
+    EOO.polygon <- rasterToPolygons(input.data)
   } else {
     EOO.chull <- grDevices::chull(EOO.points)
     EOO.envelope <- EOO.points[EOO.chull,]
-    c <- data.frame(EOO.envelope) # turn into a dataframe
-    c[,3] <- NULL # get rid of the ID column ## FAILS HERE WHEN ECOSYSTEM IS 1 Pixel
-    d <- as.matrix(c) # sp package needs a matrix
-    e <- rbind(d, d[1,]) # this adds a row at the bottom to close the ring
-    f <- Polygon(e) # creates a polygon object
-    g <- Polygons(list(f), 1) # wrap it in a polygons object
-    EOO.polygon <- SpatialPolygons(list(g)) # wrap it in a spatial polygons object
+    EOO.polygon <- SpatialPolygons(list(Polygons(list(Polygon(EOO.envelope[,1:2])), ID=1)))
   }
-  proj4string(EOO.polygon) <- crs(ecosystem.data)
+  proj4string(EOO.polygon) <- crs(input.data)
   return(EOO.polygon)
 }
 

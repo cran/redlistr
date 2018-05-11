@@ -6,7 +6,7 @@
 #'   no data value should be NA
 #' @param value.to.count Optional. Value of the cells in a RasterLayer to be
 #'   counted
-#' @return The area of the cells of interest
+#' @return The total area of the cells of interest in km2
 #' @author Nicholas Murray \email{murr.nick@@gmail.com}, Calvin Lee
 #'   \email{calvinkflee@@gmail.com}
 #' @family Change functions
@@ -46,7 +46,7 @@ getArea <- function(x, value.to.count){
       cell.res <- res(x)
       cell.width <- cell.res[1]
       x.df <- plyr::count(values(x))
-      n.cell <- x.df[which(x.df[, 1] == TRUE), ]$freq
+      n.cell <- x.df[which(!is.na(x.df[,1])), ]$freq
       aream2 <- (cell.width * cell.width) * n.cell
       areakm2 <- aream2/1000000
       return (areakm2)
@@ -126,7 +126,7 @@ getAreaLoss <- function(x, y){
 #'   Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
 #'   List of Ecosystems Categories and Criteria, Version 1.0. Gland,
 #'   Switzerland: IUCN. ix + 94pp. Available at the following web site:
-#'   \url{iucnrle.org/}
+#'   \url{https://iucnrle.org/}
 #'   Puyravaud, J.-P. 2003. Standardizing the calculation of the
 #'   annual rate of deforestation. Forest Ecology and Management, 177, 593-596.
 #' @examples
@@ -153,7 +153,7 @@ getDeclineStats <- function (A.t1, A.t2, year.t1, year.t2,
     out <- cbind(out, PRD = PRD)
   }
   if(any(methods == 'ARC')){
-    ARC <- (1/(year.t2-year.t1))*log(A.t2/A.t1)
+    ARC <- (1/(year.t2-year.t1))*log(A.t2/A.t1) * 100
     # Annual rate of change from Puyravaud 2004 (also known as instantaneous rate of change)
     out <- cbind(out, ARC = ARC)
   }
@@ -184,7 +184,7 @@ getDeclineStats <- function (A.t1, A.t2, year.t1, year.t2,
 #'   Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
 #'   List of Ecosystems Categories and Criteria, Version 1.0. Gland,
 #'   Switzerland: IUCN. ix + 94pp. Available at the following web site:
-#'   \url{iucnrle.org/}
+#'   \url{https://iucnrle.org/}
 #' @examples
 #' a.r1 <- 23.55
 #' a.r2 <- 15.79
@@ -208,7 +208,7 @@ futureAreaEstimate <- function(A.t1, year.t1, nYears, ARD = NA, PRD = NA, ARC = 
     out <- cbind(out, A.PRD.t3 = A.PRD.t3)
   }
   if(!is.na(ARC)){
-    A.ARC.t3 <- A.t1 * (1 + ARC)^nYears
+    A.ARC.t3 <- A.t1 * (1 + ARC/100)^nYears
     if(A.ARC.t3 < 0) A.ARC.t3 = 0
     out <- cbind(out, A.ARC.t3 = A.ARC.t3)
   }
