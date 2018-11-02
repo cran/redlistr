@@ -1,3 +1,20 @@
+# redlistr 1.0.2
+* Submission of update to CRAN with improvements from reviewers.
+
+# redlistr 1.0.1.9002
+* Fixed ARC calculation in extrapolateEstimate.
+* Added tests to ensure extrapolateEstimate calculations are correct.
+* Renamed ARC to Annual Rate of Change
+* Fixed getArea when raster cells are not squares
+
+# redlistr 1.0.1.9001
+* Added sequentialExtrapolate to return sequence of estimates calculated by the
+selected algorithms.
+* Updated extrapolateEstimate output wording.
+
+# redlistr 1.0.1.9000
+* Added extrapolateEstimate which will replace futureAreaEstimate.
+
 # redlistr 1.0.1
 * Fixed getArea to output a single value and included test
 * Submission of update to CRAN

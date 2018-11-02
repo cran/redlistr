@@ -20,6 +20,7 @@ We begin by loading the packages we need for the assessment. Please ensure
 that these are already installed.
 ```{r Loading packages, message=FALSE}
 library(rgeos)
+library(rgdal)
 library(redlistr)
 ```
 
@@ -39,7 +40,6 @@ mangrove.2000 <- raster(system.file("extdata", "example_distribution_2000.tif",
                                     package = "redlistr"))
 mangrove.2017 <- raster(system.file("extdata", "example_distribution_2017.tif", 
                                     package = "redlistr"))
-
 ```
 
 ### Importing data as rasters

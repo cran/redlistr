@@ -14,9 +14,9 @@ test_that("accepts different input rasters", {
   r.multiple <- r
   values(r.multiple) <- rep(c(1:10), 10)
 
-  expect_equal(getArea(r.bin), 0.1296)
+  expect_equal(getArea(r.bin), 0.0648)
   expect_warning(getArea(r.multiple), "The input raster is not binary, counting ALL non NA cells\n")
-  expect_equal(getArea(r.multiple, 1), 0.01296)
+  expect_equal(getArea(r.multiple, 1), 0.00648)
 })
 
 test_that("output is a single value", {
@@ -55,4 +55,21 @@ test_that("decline stats work", {
   expect_equal(dummy.decline.df$PRD, 12.94494, tolerance=1e-5)
   expect_equal(dummy.decline.df$ARC, -13.86294, tolerance=1e-5)
   expect_error(getDeclineStats(A.t1, A.t2, year.t1, year.t2))
+})
+
+test_that("extrapolated estimates are correct", {
+  # Dummy areas and years
+  A.t1 <- 100
+  A.t2 <- 50
+  year.t1 <- 2010
+  year.t2 <- 2015
+  dummy.decline.df <- getDeclineStats(A.t1, A.t2, year.t1, year.t2,
+                                      methods = c('ARD', 'PRD', 'ARC'))
+  dummy_extrapolate_df <- extrapolateEstimate(A.t1, year.t1, 5,
+                                              ARD = dummy.decline.df$ARD,
+                                              PRD = dummy.decline.df$PRD,
+                                              ARC = dummy.decline.df$ARC)
+  expect_equal(dummy_extrapolate_df$A.ARD.t3, A.t2)
+  expect_equal(dummy_extrapolate_df$A.PRD.t3, A.t2)
+  expect_equal(dummy_extrapolate_df$A.ARC.t3, A.t2)
 })

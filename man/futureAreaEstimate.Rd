@@ -24,20 +24,12 @@ A dataframe with the forecast year, and a combination of:
 \itemize{
  \item Future area as estimated with absolute rate of decline (ARD)
  \item Future area as estimated with proportional rate of decline (PRD)
- \item Future area as estimated with absolute rate of change (ARC)
+ \item Future area as estimated with annual rate of change (ARC)
  }
 }
 \description{
-\code{futureAreaEstimate} calculates the expected area of a distribution at a
-future date using known rates of decline.
-}
-\examples{
-a.r1 <- 23.55
-a.r2 <- 15.79
-decline.stats <- getDeclineStats(a.r1, a.r2, year.t1 = 1990, year.t2 = 2012,
-                       methods = 'PRD')
-a.2040.PRD <- futureAreaEstimate(a.r1, a.r2, year.t1 = 1990, nYears = 50,
-                                 PRD = decline.stats$PRD)
+\code{futureAreaEstimate} is now deprecated, please use
+\code{extrapolateEstimate} instead
 }
 \references{
 Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
@@ -45,6 +37,10 @@ Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
   List of Ecosystems Categories and Criteria, Version 1.0. Gland,
   Switzerland: IUCN. ix + 94pp. Available at the following web site:
   \url{https://iucnrle.org/}
+}
+\seealso{
+Other change_functions: \code{\link{extrapolateEstimate}},
+  \code{\link{sequentialExtrapolate}}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee

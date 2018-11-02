@@ -20,16 +20,17 @@ getDeclineStats(A.t1, A.t2, year.t1, year.t2, methods)
 each of them.}
 }
 \value{
-A dataframe with total area difference, and a selection of:
+A dataframe with absolute differences between the two inputs, and a
+  selection of:
 \itemize{
  \item Proportional Rate of Decline (PRD)
  \item Absolute Rate of Decline (ARD)
- \item Absolute Rate of Change (ARC)
+ \item Annual Rate of Change (ARC)
  }
 }
 \description{
 \code{getDeclineStats} calculates the Proportional Rate of Decline (PRD),
-Absolute Rate of Decline (ARD) and Absolute Rate of Change (ARC), given two
+Absolute Rate of Decline (ARD) and Annual Rate of Change (ARC), given two
 areas at two points in time. Also provides the total area difference. Inputs
 are usually the results from \code{getArea}.
 }

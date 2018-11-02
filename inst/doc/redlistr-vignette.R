@@ -1,5 +1,6 @@
 ## ----Loading packages, message=FALSE-------------------------------------
 library(rgeos)
+library(rgdal)
 library(redlistr)
 
 ## ----Loading our example distributions-----------------------------------
@@ -7,7 +8,6 @@ mangrove.2000 <- raster(system.file("extdata", "example_distribution_2000.tif",
                                     package = "redlistr"))
 mangrove.2017 <- raster(system.file("extdata", "example_distribution_2017.tif", 
                                     package = "redlistr"))
-
 
 ## ----Importing shapefile, eval=FALSE-------------------------------------
 #  library(rgdal)

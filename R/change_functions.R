@@ -26,28 +26,28 @@ getArea <- function(x, value.to.count){
     if(length(raster::unique(x)) != 1 & missing(value.to.count)){
       warning("The input raster is not binary, counting ALL non NA cells\n")
       cell.res <- res(x)
-      cell.width <- cell.res[1]
+      cell.area <- cell.res[1] * cell.res[2]
       x.df <- plyr::count(values(x))
       n.cell <- sum(x.df[which(!is.na(x.df[, 1])), ]$freq)
-      aream2 <- (cell.width * cell.width) * n.cell
+      aream2 <- cell.area * n.cell
       areakm2 <- aream2/1000000
       return (areakm2)
     }
     else if(length(raster::unique(x)) != 1){
       cell.res <- res(x)
-      cell.width <- cell.res[1]
+      cell.area <- cell.res[1] * cell.res[2]
       x.df <- plyr::count(values(x))
       n.cell <- x.df[which(x.df[, 1] == value.to.count), ]$freq
-      aream2 <- (cell.width * cell.width) * n.cell
+      aream2 <- cell.area * n.cell
       areakm2 <- aream2/1000000
       return (areakm2)
     }
     else{
       cell.res <- res(x)
-      cell.width <- cell.res[1]
+      cell.area <- cell.res[1] * cell.res[2]
       x.df <- plyr::count(values(x))
       n.cell <- x.df[which(!is.na(x.df[,1])), ]$freq
-      aream2 <- (cell.width * cell.width) * n.cell
+      aream2 <- cell.area * n.cell
       areakm2 <- aream2/1000000
       return (areakm2)
     }
@@ -102,7 +102,7 @@ getAreaLoss <- function(x, y){
 #' Change statistics.
 #'
 #' \code{getDeclineStats} calculates the Proportional Rate of Decline (PRD),
-#' Absolute Rate of Decline (ARD) and Absolute Rate of Change (ARC), given two
+#' Absolute Rate of Decline (ARD) and Annual Rate of Change (ARC), given two
 #' areas at two points in time. Also provides the total area difference. Inputs
 #' are usually the results from \code{getArea}.
 #'
@@ -113,11 +113,12 @@ getAreaLoss <- function(x, y){
 #' @param methods Method(s) used to calculate rate of decline. Either 'PRD',
 #'   'ARD', and/or 'ARC'. See vignette to see a more detailed explanation for
 #'   each of them.
-#' @return A dataframe with total area difference, and a selection of:
+#' @return A dataframe with absolute differences between the two inputs, and a
+#'   selection of:
 #' \itemize{
 #'  \item Proportional Rate of Decline (PRD)
 #'  \item Absolute Rate of Decline (ARD)
-#'  \item Absolute Rate of Change (ARC)
+#'  \item Annual Rate of Change (ARC)
 #'  }
 #' @author Nicholas Murray \email{murr.nick@@gmail.com}, Calvin Lee
 #'   \email{calvinkflee@@gmail.com}
@@ -138,13 +139,13 @@ getAreaLoss <- function(x, y){
 
 getDeclineStats <- function (A.t1, A.t2, year.t1, year.t2,
                              methods){
-  out <- data.frame(area.loss = (A.t1-A.t2))
+  out <- data.frame(absolute.loss = (A.t1-A.t2))
   if(missing(methods)){
     stop("Please select method(s) to be used for calculating the rate of decline.")
   }
   if(any(methods == 'ARD')){
     ARD <- -((A.t2-A.t1)/(year.t2-year.t1))
-    # Absolute rate of change (also known as Annual Change(R)) in Puyrvaud
+    # Absolute rate of decline (also known as Annual Change(q)) in Puyrvaud
     out <- cbind(out, ARD = ARD)
   }
   if(any(methods == 'PRD')){
@@ -162,8 +163,8 @@ getDeclineStats <- function (A.t1, A.t2, year.t1, year.t2,
 
 #' Future Area Estimate
 #'
-#' \code{futureAreaEstimate} calculates the expected area of a distribution at a
-#' future date using known rates of decline.
+#' \code{futureAreaEstimate} is now deprecated, please use
+#' \code{extrapolateEstimate} instead
 #'
 #' @param A.t1 Area at time t1
 #' @param year.t1 Year of time t1
@@ -175,7 +176,41 @@ getDeclineStats <- function (A.t1, A.t2, year.t1, year.t2,
 #' \itemize{
 #'  \item Future area as estimated with absolute rate of decline (ARD)
 #'  \item Future area as estimated with proportional rate of decline (PRD)
-#'  \item Future area as estimated with absolute rate of change (ARC)
+#'  \item Future area as estimated with annual rate of change (ARC)
+#'  }
+#' @author Nicholas Murray \email{murr.nick@@gmail.com}, Calvin Lee
+#'   \email{calvinkflee@@gmail.com}
+#' @family change_functions
+#' @references Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
+#'   Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
+#'   List of Ecosystems Categories and Criteria, Version 1.0. Gland,
+#'   Switzerland: IUCN. ix + 94pp. Available at the following web site:
+#'   \url{https://iucnrle.org/}
+#' @export
+
+futureAreaEstimate <- function(A.t1, year.t1, nYears, ARD = NA, PRD = NA, ARC = NA){
+  .Deprecated("extrapolateEstimate", "redlistr")
+  extrapolateEstimate(A.t1 = A.t1, year.t1 = year.t1, nYears = nYears,
+                      ARD = ARD, PRD = PRD, ARC = ARC)
+}
+
+#' Extrapolate Estimate
+#'
+#' \code{extrapolateEstimate} uses rates of decline from getDeclineStats
+#' to extrapolate estimates to a given time
+#'
+#' @param A.t1 Area at time t1
+#' @param year.t1 Year of time t1
+#' @param nYears Number of years since t1 for prediction. Use negative
+#' values for backcasting
+#' @param ARD Absolute rate of decline
+#' @param PRD Proportional rate of decline
+#' @param ARC Annual rate of change
+#' @return A dataframe with the forecast year, and a combination of:
+#' \itemize{
+#'  \item Values as extrapolated with absolute rate of decline (ARD)
+#'  \item Values as extrapolated with proportional rate of decline (PRD)
+#'  \item Values as extrapolated with annual rate of change (ARC)
 #'  }
 #' @author Nicholas Murray \email{murr.nick@@gmail.com}, Calvin Lee
 #'   \email{calvinkflee@@gmail.com}
@@ -189,12 +224,12 @@ getDeclineStats <- function (A.t1, A.t2, year.t1, year.t2,
 #' a.r1 <- 23.55
 #' a.r2 <- 15.79
 #' decline.stats <- getDeclineStats(a.r1, a.r2, year.t1 = 1990, year.t2 = 2012,
-#'                        methods = 'PRD')
-#' a.2040.PRD <- futureAreaEstimate(a.r1, a.r2, year.t1 = 1990, nYears = 50,
-#'                                  PRD = decline.stats$PRD)
+#'                                  methods = 'PRD')
+#' a.2040.PRD <- extrapolateEstimate(a.r1, a.r2, year.t1 = 1990, nYears = 50,
+#'                                   PRD = decline.stats$PRD)
 #' @export
 
-futureAreaEstimate <- function(A.t1, year.t1, nYears, ARD = NA, PRD = NA, ARC = NA){
+extrapolateEstimate <- function(A.t1, year.t1, nYears, ARD = NA, PRD = NA, ARC = NA){
   y.t3 <- year.t1+nYears
   out <- data.frame(forecast.year = y.t3)
   if(!is.na(ARD)){
@@ -208,7 +243,7 @@ futureAreaEstimate <- function(A.t1, year.t1, nYears, ARD = NA, PRD = NA, ARC = 
     out <- cbind(out, A.PRD.t3 = A.PRD.t3)
   }
   if(!is.na(ARC)){
-    A.ARC.t3 <- A.t1 * (1 + ARC/100)^nYears
+    A.ARC.t3 <- A.t1 * exp(ARC/100*nYears)
     if(A.ARC.t3 < 0) A.ARC.t3 = 0
     out <- cbind(out, A.ARC.t3 = A.ARC.t3)
   }
@@ -216,4 +251,66 @@ futureAreaEstimate <- function(A.t1, year.t1, nYears, ARD = NA, PRD = NA, ARC = 
     stop("Please input at least one of 'ARD', 'PRD', or 'ARC'.")
   }
   return(out)
+}
+
+#' Sequential extrapolation estimate
+#'
+#' \code{sequentialExtrapolate} uses rates of decline from getDeclineStats and
+#' generates a sequence of estimates at regular time-steps. Useful for
+#' generating a sequence for plotting graphs.
+#'
+#' @inheritParams extrapolateEstimate
+#'
+#' @return A dataframe with the forecast year, and a combination of:
+#' \itemize{
+#'  \item Sequence of values as extrapolated with absolute rate of decline (ARD)
+#'  \item Sequence of values as extrapolated with proportional rate of decline (PRD)
+#'  \item Sequence of values as extrapolated with annual rate of change (ARC)
+#'  }
+#' @author Calvin Lee \email{calvinkflee@@gmail.com}
+#' @family change_functions
+#' @references Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
+#'   Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
+#'   List of Ecosystems Categories and Criteria, Version 1.0. Gland,
+#'   Switzerland: IUCN. ix + 94pp. Available at the following web site:
+#'   \url{https://iucnrle.org/}
+#' @examples
+#' a.r1 <- 23.55
+#' a.r2 <- 15.79
+#' decline.stats <- getDeclineStats(a.r1, a.r2, year.t1 = 1990, year.t2 = 2012,
+#'                                  methods = 'PRD')
+#' a.2040.PRD.seq <- sequentialExtrapolate(a.r1, a.r2, year.t1 = 1990, nYears = 50,
+#'                                         PRD = decline.stats$PRD)
+#' @export
+
+sequentialExtrapolate <- function(A.t1, year.t1, nYears, ARD = NA, PRD = NA, ARC = NA){
+  if(all(c(is.na(PRD), is.na(ARD), is.na(ARC)))){
+    stop("Please input at least one of 'ARD', 'PRD', or 'ARC'.")
+  }
+  ARD_seq <- vector()
+  PRD_seq <- vector()
+  ARC_seq <- vector()
+  for(i in 0:nYears){
+    estimate <- extrapolateEstimate(A.t1,
+                                    year.t1,
+                                    nYears = i,
+                                    ARD = ARD,
+                                    PRD = PRD,
+                                    ARC = ARC)
+
+    ARD_seq <- c(ARD_seq, estimate$A.ARD.t3)
+    PRD_seq <- c(PRD_seq, estimate$A.PRD.t3)
+    ARC_seq <- c(ARC_seq, estimate$A.ARC.t3)
+  }
+
+  years <- seq(year.t1, sum(year.t1, nYears))
+
+  # Dealing with empty vectors
+  if(length(ARD_seq) == 0) ARD_seq <- NA
+  if(length(PRD_seq) == 0) PRD_seq <- NA
+  if(length(ARC_seq) == 0) ARC_seq <- NA
+
+  out_df <- data.frame(years = years, ARD = ARD_seq,
+                       PRD = PRD_seq, ARC = ARC_seq)
+  return(out_df)
 }
