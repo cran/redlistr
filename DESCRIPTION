@@ -1,6 +1,6 @@
 Package: redlistr
 Title: Tools for the IUCN Red List of Ecosystems and Species
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
   person("Calvin", "Lee", role = c("cre", "aut"),
     email = "calvinkflee@gmail.com",
@@ -22,12 +22,12 @@ Depends: R (>= 3.3.0), raster (>= 2.5-8), sp (>= 1.2-4)
 Suggests: devtools, knitr, rgdal, rmarkdown, testthat
 License: GPL (>= 3) | file LICENSE
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2018-11-02 06:54:52 UTC; kfle
+Packaged: 2019-07-11 06:26:31 UTC; kfle
 Author: Calvin Lee [cre, aut] (<https://orcid.org/0000-0001-8277-8614>),
   Nicholas Murray [aut] (<https://orcid.org/0000-0002-4008-3053>)
 Maintainer: Calvin Lee <calvinkflee@gmail.com>
 Repository: CRAN
-Date/Publication: 2018-11-02 07:20:02 UTC
+Date/Publication: 2019-07-11 13:42:58 UTC

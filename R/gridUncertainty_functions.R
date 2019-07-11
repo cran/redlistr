@@ -44,8 +44,8 @@ gridUncertaintyBase <- function(input.data, grid.size,
   y.shift <- seq(0, grid.size, intervals)
   y.shift <- y.shift[1:length(y.shift)-1]
   # Create the movement grid with jiggle
-  shift.grid <- expand.grid(x.shift = (x.shift + sample(0:(grid.size*0.05), 1)),
-                            y.shift = (y.shift + sample(0:(grid.size*0.05), 1)))
+  shift.grid <- expand.grid(x.shift = (x.shift + sample(0:(intervals*0.05), 1)),
+                            y.shift = (y.shift + sample(0:(intervals*0.05), 1)))
 
   if(restriction){ # Only modift shift.grid when restriction = T
     # apply to get index of the restricted shift.grid we want
@@ -67,7 +67,7 @@ gridUncertaintyBase <- function(input.data, grid.size,
     # Pull out the values for each shift
     current.xshift <- gridList["x.shift"]
     current.yshift <- gridList["y.shift"]
-    grid.shift <- shift(grid, x = current.xshift, y = current.yshift)
+    grid.shift <- shift(grid, current.xshift, current.yshift)
     return(grid.shift)
   })
   AOO.list <- lapply(grid.shifted.list, getAOOSilent, # List of AOO for each scenario
@@ -133,7 +133,7 @@ gridUncertaintyRandomManual <- function(input.data, grid.size, n.sim = 10,
     x.shift <- sample(-grid.size:grid.size, 1)
     y.shift <- sample(-grid.size:grid.size, 1)
     dist.move <- sqrt((x.shift^2)+(y.shift^2)) # Total distance moved using Pythagoras
-    shifted.grid <- shift(grid, x = x.shift, y = y.shift)
+    shifted.grid <- shift(grid, x.shift, y.shift)
     AOO <- getAOOSilent(input.data = input.data,
                         grid = shifted.grid, min.percent.rule = min.percent.rule,
                         percent = percent) # get the AOO for each sampled grid
@@ -212,7 +212,7 @@ gridUncertaintyRandom <- function(input.data, grid.size, n.AOO.improvement,
     x.shift <- sample(-grid.size:grid.size, 1)
     y.shift <- sample(-grid.size:grid.size, 1)
     dist.move <- sqrt((x.shift^2)+(y.shift^2)) # Total distance moved using Pythagoras
-    shifted.grid <- shift(grid, x = x.shift, y = y.shift)
+    shifted.grid <- shift(grid, x.shift, y.shift)
     AOO <- getAOOSilent(input.data = input.data,
                         grid = shifted.grid, min.percent.rule = min.percent.rule,
                         percent = percent) # get the AOO for each sampled grid
@@ -230,7 +230,7 @@ gridUncertaintyRandom <- function(input.data, grid.size, n.AOO.improvement,
     x.shift <- sample(-grid.size:grid.size, 1)
     y.shift <- sample(-grid.size:grid.size, 1)
     dist.move <- sqrt((x.shift^2)+(y.shift^2)) # Total distance moved using Pythagoras
-    shifted.grid <- shift(grid, x = x.shift, y = y.shift)
+    shifted.grid <- shift(grid, x.shift, y.shift)
     AOO <- getAOOSilent(input.data = input.data,
                         grid = shifted.grid, min.percent.rule = min.percent.rule,
                         percent = percent) # get the AOO for each sampled grid
@@ -374,8 +374,8 @@ gridUncertaintySimulation <- function(input.data, grid.size, simulations,
     results <- gridUncertaintyBase(input.data = input.data,
                                grid.size = grid.size, splits = i,
                                min.percent.rule = min.percent.rule, percent = percent)
-    out.df[i, 2] <- results$stats$min.AOO
-    out.df[i, 3] <- results$stats$max.AOO
+    out.df[i, 2] <- results$summary.df$min.AOO
+    out.df[i, 3] <- results$summary.df$max.AOO
   }
   return(out.df)
 }

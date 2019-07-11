@@ -1,3 +1,17 @@
+# redlistr 1.0.3
+* Submission of update to CRAN to ensure compatibility with raster.
+
+# redlistr 1.0.2.9002
+* Updated gridUncertainty functions to ensure compatibility with the parameter
+requirements for raster::shift().
+
+# redlistr 1.0.2.9001
+* Fixed gridUncertaintySimulation.
+
+# redlistr 1.0.2.9000
+* Changed the way the random jittering in gridUncertainty works to be more
+useful as the splits get smaller.
+
 # redlistr 1.0.2
 * Submission of update to CRAN with improvements from reviewers.
 
