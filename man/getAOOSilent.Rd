@@ -7,9 +7,8 @@
 getAOOSilent(input.data, grid, min.percent.rule = FALSE, percent = 1)
 }
 \arguments{
-\item{input.data}{Object of an ecosystem or species distribution. Accepts either
-raster or spatial points formats. Please use a CRS with units measured in
-metres.}
+\item{input.data}{Spatial object of an ecosystem or species distribution.
+Please use a CRS with units measured in metres.}
 
 \item{grid}{Custom grid to be used to calculate AOO. Usually the output of
 \code{gridUncertainty}}
@@ -28,11 +27,13 @@ Value. The AOO calculated with the input distribution and grid.
 input of the grid parameter. Used for \code{gridUncertainty}.
 }
 \seealso{
-Other AOO functions: \code{\link{createGrid}},
-  \code{\link{getAOO}}, \code{\link{makeAOOGrid}}
+Other AOO functions: 
+\code{\link{createGrid}()},
+\code{\link{getAOO}()},
+\code{\link{makeAOOGrid}()}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee
-  \email{calvinkflee@gmail.com}
+\email{calvinkflee@gmail.com}
 }
 \concept{AOO functions}

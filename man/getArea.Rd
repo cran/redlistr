@@ -4,21 +4,21 @@
 \alias{getArea}
 \title{Calculates the Area of a Raster.}
 \usage{
-getArea(x, value.to.count)
+getArea(x, ...)
 }
 \arguments{
 \item{x}{Either a RasterLayer or SpatialPolygons object. For a RasterLayer,
 no data value should be NA}
 
-\item{value.to.count}{Optional. Value of the cells in a RasterLayer to be
-counted}
+\item{...}{Addition arguments based on input format}
 }
 \value{
 The total area of the cells of interest in km2
 }
 \description{
 \code{getArea} reports the area of a RasterLayer object using the pixel
-counting method, or the area of a SpatialPolygons object using rgeos::gArea
+counting method, or terra::expanse for SpatRaster and SpatVector objects,
+or the area of a SpatialPolygons or sf object using sf::st_area
 }
 \examples{
 crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
@@ -27,11 +27,17 @@ extent(r1) <- extent(0, 6100, 0, 8700)
 a.r1 <- getArea(r1) # area of all non-NA cells in r1
 }
 \seealso{
-Other Change functions: \code{\link{getAreaLoss}},
-  \code{\link{getDeclineStats}}
+Other Change functions: 
+\code{\link{getArea.RasterLayer}()},
+\code{\link{getArea.SpatRaster}()},
+\code{\link{getArea.SpatVect}()},
+\code{\link{getArea.SpatialPolygons}()},
+\code{\link{getArea.sf}()},
+\code{\link{getAreaLoss}()},
+\code{\link{getDeclineStats}()}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee
-  \email{calvinkflee@gmail.com}
+\email{calvinkflee@gmail.com}
 }
 \concept{Change functions}

@@ -1,5 +1,3 @@
-context("Get Area")
-
 test_that("input cannot be in lonlat crs",{
   r.crs <- raster(nrows=10, ncols=10)
   expect_error(getArea(r.crs), "Input raster has a longitude/latitude CRS.\nPlease reproject to a projected coordinate system")
@@ -38,7 +36,7 @@ test_that("accepts SpatialPolygons", {
   my_polygons = Polygons(list(my_polygon), ID = "A")
   dummy_polygon = SpatialPolygons(list(my_polygons))
 
-  expect_equal(getArea(dummy_polygon), 1)
+  expect_equal(getArea(dummy_polygon), 1000*1000)
 })
 
 context("Change functions")

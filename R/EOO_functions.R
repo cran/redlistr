@@ -1,12 +1,13 @@
 #' Creates Extent of occurrence (EOO) Polygon
 #'
-#' \code{makeEOO} creates a  minimum convex polygon enclosing all occurrences of
-#' the provided data
-#' @param input.data Object of an ecosystem or species distribution. Accepts either
-#'   raster or spatial points formats. Please use a CRS with units measured in
-#'   metres.
-#' @return An object of class SpatialPolygons representing the EOO of
-#'   \code{input.data}. Also inherits its CRS.
+#' `makeEOO` is a generic function that creates a  minimum convex polygon
+#' enclosing all occurrences of the provided spatial data. If the input provided
+#' is a raster layer, the points are taken from a buffer that has the radius of
+#' half of the shorter edge of the pixel around the centroid.
+#' @param input.data Spatial object of an ecosystem or species distribution.
+#'   Please use a CRS with units measured in metres.
+#' @return An object of class SpatVect representing the EOO of
+#'   `input.data`. Also inherits its CRS.
 #' @author Nicholas Murray \email{murr.nick@@gmail.com}, Calvin Lee
 #'   \email{calvinkflee@@gmail.com}
 #' @family EOO functions
@@ -14,54 +15,79 @@
 #'   Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
 #'   List of Ecosystems Categories and Criteria, Version 1.0. Gland,
 #'   Switzerland: IUCN. ix + 94pp. Available at the following web site:
-#'   \url{https://iucnrle.org/}
+#'   <https://iucnrle.org/>
 #' @examples
+#' library(terra)
 #' crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
-#' r1 <- raster(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
-#' extent(r1) <- extent(0, 6100, 0, 8700)
+#' r1 <- rast(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
+#' ext(r1) <- c(0, 6100, 0, 8700)
 #' EOO.polygon <- makeEOO(r1)
 #' @export
 #' @import sp
 #' @import raster
+#' @import terra
 
-makeEOO <- function(input.data){
-  if(class(input.data) == "RasterLayer"){
-    # Makes an EOO spatial polygon using the centre point of each pixel as the boundary
-    EOO.points <- rasterToPoints(input.data)
-  } else EOO.points <- input.data@coords # accessing coordinates of shapefile
-  if (nrow(EOO.points) <= 1) { # handling single pixels since chull fails for 1 pixel
-    EOO.polygon <- rasterToPolygons(input.data)
-  } else {
-    EOO.chull <- grDevices::chull(EOO.points)
-    EOO.envelope <- EOO.points[EOO.chull,]
-    EOO.polygon <- SpatialPolygons(list(Polygons(list(Polygon(EOO.envelope[,1:2])), ID=1)))
-  }
-  proj4string(EOO.polygon) <- crs(input.data)
+makeEOO <- function(input.data) UseMethod("makeEOO", input.data)
+
+#' @export
+makeEOO.RasterLayer <- function(input.data){
+  input_rast <- rast(input.data)
+  EOO.points <- as.points(input_rast)
+  EOO.buffer <- buffer(EOO.points, min(res(input_rast)) / 2)
+  EOO.polygon <- convHull(EOO.buffer)
+  return(EOO.polygon)
+}
+
+#' @export
+makeEOO.SpatRaster <- function(input.data){
+  EOO.points <- as.points(input.data)
+  EOO.buffer <- buffer(EOO.points, min(res(input.data)) / 2)
+  EOO.polygon <- convHull(EOO.buffer)
+  return(EOO.polygon)
+}
+
+#' @export
+makeEOO.SpatialPoints <- function(input.data){
+  input_vect <- vect(input.data)
+  EOO.polygon <- convHull(input_vect)
+  return(EOO.polygon)
+}
+
+#' @export
+makeEOO.SpatialPolygons <- function(input.data){
+  input_vect <- vect(input.data)
+  EOO.polygon <- convHull(input_vect)
+  return(EOO.polygon)
+}
+
+#' @export
+makeEOO.SpatVector <- function(input.data){
+  EOO.polygon <- convHull(input.data)
   return(EOO.polygon)
 }
 
 #' Calculates area of the created EOO polygon.
 #'
-#' \code{getAreaEOO} calculates the area of the EOO polygon generated from
-#' \code{makeEOO} the provided data
-#' @param EOO.polygon An object of class SpatialPolygons, usually the output
-#'   from \code{makeEOO}.
-#' @return The area of the \code{EOO.polygon} in km2
+#' `getAreaEOO` calculates the area of the EOO polygon generated from
+#' `makeEOO` the provided data
+#' @param EOO.polygon An object of class SpatVect, usually the output
+#'   from `makeEOO`.
+#' @param unit Character. Output unit of area. One of "m", "km", or "ha"
+#' @return The area of the `EOO.polygon` in km2
 #' @author Nicholas Murray \email{murr.nick@@gmail.com}, Calvin Lee
 #'   \email{calvinkflee@@gmail.com}
 #' @family EOO functions
 #' @examples
+#' library(terra)
 #' crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
-#' r1 <- raster(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
-#' extent(r1) <- extent(0, 6100, 0, 8700)
+#' r1 <- rast(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
+#' ext(r1) <- c(0, 6100, 0, 8700)
 #' EOO.polygon <- makeEOO(r1)
 #' EOO.area <- getAreaEOO(EOO.polygon)
 #' @export
+#' @import terra
 
-getAreaEOO <- function(EOO.polygon){
-  # Returns the area of the makeEOO output (spatialpolygons object)
-  EOO.aream2 <- sapply(methods::slot(EOO.polygon, "polygons"), methods::slot, "area")
-  # get the area from the slots in the polygon dataset
-  EOO.areakm2 <- EOO.aream2/1000000
-  return(EOO.areakm2)
+getAreaEOO <- function(EOO.polygon, unit = "km"){
+  EOO.area <- expanse(EOO.polygon, unit)
+  return(EOO.area)
 }

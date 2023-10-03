@@ -7,36 +7,39 @@
 makeEOO(input.data)
 }
 \arguments{
-\item{input.data}{Object of an ecosystem or species distribution. Accepts either
-raster or spatial points formats. Please use a CRS with units measured in
-metres.}
+\item{input.data}{Spatial object of an ecosystem or species distribution.
+Please use a CRS with units measured in metres.}
 }
 \value{
-An object of class SpatialPolygons representing the EOO of
-  \code{input.data}. Also inherits its CRS.
+An object of class SpatVect representing the EOO of
+\code{input.data}. Also inherits its CRS.
 }
 \description{
-\code{makeEOO} creates a  minimum convex polygon enclosing all occurrences of
-the provided data
+\code{makeEOO} is a generic function that creates a  minimum convex polygon
+enclosing all occurrences of the provided spatial data. If the input provided
+is a raster layer, the points are taken from a buffer that has the radius of
+half of the shorter edge of the pixel around the centroid.
 }
 \examples{
+library(terra)
 crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
-r1 <- raster(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
-extent(r1) <- extent(0, 6100, 0, 8700)
+r1 <- rast(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
+ext(r1) <- c(0, 6100, 0, 8700)
 EOO.polygon <- makeEOO(r1)
 }
 \references{
 Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
-  Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
-  List of Ecosystems Categories and Criteria, Version 1.0. Gland,
-  Switzerland: IUCN. ix + 94pp. Available at the following web site:
-  \url{https://iucnrle.org/}
+Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
+List of Ecosystems Categories and Criteria, Version 1.0. Gland,
+Switzerland: IUCN. ix + 94pp. Available at the following web site:
+\url{https://iucnrle.org/}
 }
 \seealso{
-Other EOO functions: \code{\link{getAreaEOO}}
+Other EOO functions: 
+\code{\link{getAreaEOO}()}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee
-  \email{calvinkflee@gmail.com}
+\email{calvinkflee@gmail.com}
 }
 \concept{EOO functions}

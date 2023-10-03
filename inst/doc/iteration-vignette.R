@@ -1,11 +1,11 @@
-## ----global_options, include=FALSE---------------------------------------
+## ----global_options, include=FALSE--------------------------------------------
 knitr::opts_chunk$set(eval = FALSE)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 #  library(redlistr)
 #  library(stringr)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 #  # Example directory
 #  input_dir <- # Path to folder with tif files
 #  out_dir <- "C:/Users/Username/Desktop"
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(eval = FALSE)
 #  # Option to save shapefiles or not
 #  saveSHP <- T
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 #  # set up data capture
 #  results_df <- data.frame (
 #    # Name of the raster
@@ -32,7 +32,7 @@ knitr::opts_chunk$set(eval = FALSE)
 #    # Time taken for the analysis to complete
 #    time.taken = NA)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 #  for (i in seq_along(input_list)){
 #    # Prints out a message showing progress
 #    message (paste("working on number... ", i, " of ", length(input_list)))
@@ -79,18 +79,18 @@ knitr::opts_chunk$set(eval = FALSE)
 #  # Saving the outputs as a csv file
 #  write.csv(results_df, paste(out_dir, "redlistr_analysis.csv"))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 #  library(redlistr)
 #  library(stringr)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 #  # Example directory
 #  input_rast <- # raster(...)
 #  out_dir <- "C:/Users/Username/Desktop"
 #  # Option to save shapefiles or not
 #  saveSHP <- T
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 #  # set up data capture
 #  results_df <- data.frame (
 #    # Name of the raster
@@ -108,7 +108,7 @@ knitr::opts_chunk$set(eval = FALSE)
 #    # Time taken for the analysis to complete
 #    time.taken = NA)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 #  val_table <- freq(input_rast, useNA = "no") # get class values from raster
 #  vals <- val_table[,1] # convert table of values to vector
 #  message('Raster has >>> ', length(vals) , ' <<< classes' )

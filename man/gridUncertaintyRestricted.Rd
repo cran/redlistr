@@ -5,13 +5,17 @@
 \title{Function to compute AOO with grid uncertainty systematically with stopping
 rule and restrictions}
 \usage{
-gridUncertaintyRestricted(input.data, grid.size, n.AOO.improvement,
-  min.percent.rule = FALSE, percent = 1)
+gridUncertaintyRestricted(
+  input.data,
+  grid.size,
+  n.AOO.improvement,
+  min.percent.rule = FALSE,
+  percent = 1
+)
 }
 \arguments{
-\item{input.data}{Object of an ecosystem or species distribution. Accepts either
-raster or spatial points formats. Please use a CRS with units measured in
-metres.}
+\item{input.data}{Spatial object of an ecosystem or species distribution.
+Please use a CRS with units measured in metres.}
 
 \item{grid.size}{A number specifying the width of the desired grid square (in
 same units as your coordinate reference system)}
@@ -28,10 +32,10 @@ the \code{min.percent.rule}.}
 \value{
 A list containing the following:
 \itemize{
- \item Data frame of results showing the minimum AOO calculated for each
- shift scenario
- \item Single SpatialPolygonsDataFrame containing the AOO grid which would
- produce the minimum AOO calculated
+\item Data frame of results showing the minimum AOO calculated for each
+shift scenario
+\item Single SpatialPolygonsDataFrame containing the AOO grid which would
+produce the minimum AOO calculated
 }
 }
 \description{
@@ -43,11 +47,12 @@ include those which are already found nearby to ones already with the minimum
 AOO.
 }
 \seealso{
-Other gridUncertainty functions: \code{\link{gridUncertaintyBase}},
-  \code{\link{gridUncertaintyRandomManual}},
-  \code{\link{gridUncertaintyRandom}},
-  \code{\link{gridUncertaintySimulation}},
-  \code{\link{gridUncertainty}}
+Other gridUncertainty functions: 
+\code{\link{gridUncertaintyBase}()},
+\code{\link{gridUncertaintyRandomManual}()},
+\code{\link{gridUncertaintyRandom}()},
+\code{\link{gridUncertaintySimulation}()},
+\code{\link{gridUncertainty}()}
 }
 \author{
 Calvin Lee \email{calvinkflee@gmail.com}

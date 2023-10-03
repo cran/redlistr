@@ -4,13 +4,18 @@
 \alias{gridUncertaintyRandom}
 \title{Function to compute AOO with grid uncertainty randomly with stop rule}
 \usage{
-gridUncertaintyRandom(input.data, grid.size, n.AOO.improvement,
-  min.percent.rule = FALSE, percent = 1, max.n.rounds = 1000)
+gridUncertaintyRandom(
+  input.data,
+  grid.size,
+  n.AOO.improvement,
+  min.percent.rule = FALSE,
+  percent = 1,
+  max.n.rounds = 1000
+)
 }
 \arguments{
-\item{input.data}{Object of an ecosystem or species distribution. Accepts either
-raster or spatial points formats. Please use a CRS with units measured in
-metres.}
+\item{input.data}{Spatial object of an ecosystem or species distribution.
+Please use a CRS with units measured in metres.}
 
 \item{grid.size}{A number specifying the width of the desired grid square (in
 same units as your coordinate reference system)}
@@ -30,11 +35,11 @@ Generally unused except to limit computation time.}
 \value{
 List containing the following:
 \itemize{
- \item Data frame of summary statistics for the results
- \item Data frame showing the distance shifted in x and y directions used to
- create the AOO grid(s) and their associated AOOs
- \item List of RasterLayer(s) containing the AOO grid(s) which return the
- smallest AOO
+\item Data frame of summary statistics for the results
+\item Data frame showing the distance shifted in x and y directions used to
+create the AOO grid(s) and their associated AOOs
+\item List of RasterLayer(s) containing the AOO grid(s) which return the
+smallest AOO
 }
 }
 \description{
@@ -49,20 +54,21 @@ stops when the AOO no longer improves after a specified number of rounds.
 crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
 r1 <- raster(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
 extent(r1) <- extent(0, 6100, 0, 8700)
-x <- gridUncertaintyRandom(r1, grid.size = 10000, n.AOO.improvement = 50,
+x <- gridUncertaintyRandom(r1, grid.size = 1000, n.AOO.improvement = 50,
                            min.percent.rule = TRUE, percent = 1)
 }
 \seealso{
-\code{\link{createGrid}} \code{\link{getAOOSilent}}
+\code{\link[=createGrid]{createGrid()}} \code{\link[=getAOOSilent]{getAOOSilent()}}
 
-Other gridUncertainty functions: \code{\link{gridUncertaintyBase}},
-  \code{\link{gridUncertaintyRandomManual}},
-  \code{\link{gridUncertaintyRestricted}},
-  \code{\link{gridUncertaintySimulation}},
-  \code{\link{gridUncertainty}}
+Other gridUncertainty functions: 
+\code{\link{gridUncertaintyBase}()},
+\code{\link{gridUncertaintyRandomManual}()},
+\code{\link{gridUncertaintyRestricted}()},
+\code{\link{gridUncertaintySimulation}()},
+\code{\link{gridUncertainty}()}
 }
 \author{
 Calvin Lee \email{calvinkflee@gmail.com}. Nicholas Murray
-  \email{murr.nick@gmail.com}
+\email{murr.nick@gmail.com}
 }
 \concept{gridUncertainty functions}

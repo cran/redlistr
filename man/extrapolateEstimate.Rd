@@ -4,8 +4,7 @@
 \alias{extrapolateEstimate}
 \title{Extrapolate Estimate}
 \usage{
-extrapolateEstimate(A.t1, year.t1, nYears, ARD = NA, PRD = NA,
-  ARC = NA)
+extrapolateEstimate(A.t1, year.t1, nYears, ARD = NA, PRD = NA, ARC = NA)
 }
 \arguments{
 \item{A.t1}{Area at time t1}
@@ -24,10 +23,10 @@ values for backcasting}
 \value{
 A dataframe with the forecast year, and a combination of:
 \itemize{
- \item Values as extrapolated with absolute rate of decline (ARD)
- \item Values as extrapolated with proportional rate of decline (PRD)
- \item Values as extrapolated with annual rate of change (ARC)
- }
+\item Values as extrapolated with absolute rate of decline (ARD)
+\item Values as extrapolated with proportional rate of decline (PRD)
+\item Values as extrapolated with annual rate of change (ARC)
+}
 }
 \description{
 \code{extrapolateEstimate} uses rates of decline from getDeclineStats
@@ -43,17 +42,18 @@ a.2040.PRD <- extrapolateEstimate(a.r1, a.r2, year.t1 = 1990, nYears = 50,
 }
 \references{
 Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
-  Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
-  List of Ecosystems Categories and Criteria, Version 1.0. Gland,
-  Switzerland: IUCN. ix + 94pp. Available at the following web site:
-  \url{https://iucnrle.org/}
+Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
+List of Ecosystems Categories and Criteria, Version 1.0. Gland,
+Switzerland: IUCN. ix + 94pp. Available at the following web site:
+\url{https://iucnrle.org/}
 }
 \seealso{
-Other change_functions: \code{\link{futureAreaEstimate}},
-  \code{\link{sequentialExtrapolate}}
+Other change_functions: 
+\code{\link{futureAreaEstimate}()},
+\code{\link{sequentialExtrapolate}()}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee
-  \email{calvinkflee@gmail.com}
+\email{calvinkflee@gmail.com}
 }
 \concept{change_functions}

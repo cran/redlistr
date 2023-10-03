@@ -4,11 +4,13 @@
 \alias{getAreaEOO}
 \title{Calculates area of the created EOO polygon.}
 \usage{
-getAreaEOO(EOO.polygon)
+getAreaEOO(EOO.polygon, unit = "km")
 }
 \arguments{
-\item{EOO.polygon}{An object of class SpatialPolygons, usually the output
+\item{EOO.polygon}{An object of class SpatVect, usually the output
 from \code{makeEOO}.}
+
+\item{unit}{Character. Output unit of area. One of "m", "km", or "ha"}
 }
 \value{
 The area of the \code{EOO.polygon} in km2
@@ -18,17 +20,19 @@ The area of the \code{EOO.polygon} in km2
 \code{makeEOO} the provided data
 }
 \examples{
+library(terra)
 crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
-r1 <- raster(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
-extent(r1) <- extent(0, 6100, 0, 8700)
+r1 <- rast(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
+ext(r1) <- c(0, 6100, 0, 8700)
 EOO.polygon <- makeEOO(r1)
 EOO.area <- getAreaEOO(EOO.polygon)
 }
 \seealso{
-Other EOO functions: \code{\link{makeEOO}}
+Other EOO functions: 
+\code{\link{makeEOO}()}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee
-  \email{calvinkflee@gmail.com}
+\email{calvinkflee@gmail.com}
 }
 \concept{EOO functions}
