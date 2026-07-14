@@ -4,36 +4,57 @@
 \alias{makeAOOGrid}
 \title{Create Area of Occupancy (AOO) grid for an ecosystem or species distribution}
 \usage{
-makeAOOGrid(input.data, grid.size, min.percent.rule = FALSE, percent = 1)
+makeAOOGrid(
+  input_data,
+  cell_size = 10000,
+  names_from = NA,
+  bottom_1pct_rule = TRUE,
+  percent = 1,
+  jitter = 150,
+  n_jitter = 35
+)
 }
 \arguments{
-\item{input.data}{Spatial object of an ecosystem or species distribution.
+\item{input_data}{Spatial object (sf or SpatRaster) of an ecosystem or species distribution.
 Please use a CRS with units measured in metres.}
 
-\item{grid.size}{A number specifying the width of the desired grid square (in
+\item{cell_size}{A number specifying the width of the desired grid square (in
 same units as your coordinate reference system)}
 
-\item{min.percent.rule}{Logical. If \code{TRUE}, a minimum area threshold
-must be passed before a grid is counted as an AOO grid.}
+\item{names_from}{the name of the column containing ecosystem labels}
+
+\item{bottom_1pct_rule}{Logical. If \code{TRUE}, grid cells containing the least
+ecosystem area are dropped up to 1\% of the total distribution.}
 
 \item{percent}{Numeric. The minimum percent to be applied as a threshold for
-the \code{min.percent.rule}}
+the \code{bottom_1pct_rule}}
+
+\item{jitter}{Integer. 0 = do not jitter, 1 = force jitter, another number
+indicates conditional jitter, the number of AOO cells under which to jitter,
+and over which not to jitter the grid.}
+
+\item{n_jitter}{the number of grids to test for ecosystems near
+the AOO thresholds. Ignored if jitter = FALSE.}
 }
 \value{
-A shapefile of grid cells occupied by an ecosystem or species
+A shapefile of grid cells occupied by an ecosystem or species, or a
+list of these if multiple ecosystems were input.
 }
 \description{
 \code{makeAOOGrid} is a generic function that creates grids representing the
 area of occupancy for distributions based on the input spatial data. It
-includes capability for specifying whether a minimum percent of the grid cell
-needs to be occupied before it is counted in the AOO. This functionality is
+includes capability for specifying whether the least occupied cells collectively
+containing less than 1\% of the ecosystem are counted in the AOO. This functionality is
 important for assessing the IUCN Red List of Ecosystems Criteria B.
 }
 \examples{
-crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
-r1 <- raster(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
-extent(r1) <- extent(0, 6100, 0, 8700)
-AOO_grid <- makeAOOGrid(r1, 1000, min.percent.rule = TRUE, percent = 1)
+if (requireNamespace("terra", quietly = TRUE)) {
+  ok <- try({
+      m <- matrix(sample(1:4, 500, replace = TRUE, prob = c(4,1,1,6)), nrow=25, ncol=20)
+      r1 <- terra::rast(m, crs = "+proj=utm +zone=55 +south +datum=WGS84 +units=m +no_defs")
+      AOO_grid <- makeAOOGrid(r1, cell_size = 3)
+  }, silent = TRUE)
+}
 }
 \references{
 Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
@@ -45,11 +66,12 @@ Switzerland: IUCN. ix + 94pp. Available at the following web site:
 \seealso{
 Other AOO functions: 
 \code{\link{createGrid}()},
-\code{\link{getAOOSilent}()},
-\code{\link{getAOO}()}
+\code{\link{getAOO}()},
+\code{\link{jplot}()},
+\code{\link{top_pct}()}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee
-\email{calvinkflee@gmail.com}
+\email{calvinkflee@gmail.com}, Aniko B. Toth \email{anikobtoth@gmail.com}
 }
 \concept{AOO functions}

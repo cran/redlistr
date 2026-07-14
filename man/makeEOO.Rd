@@ -4,39 +4,46 @@
 \alias{makeEOO}
 \title{Creates Extent of occurrence (EOO) Polygon}
 \usage{
-makeEOO(input.data)
+makeEOO(input_data, names_from)
 }
 \arguments{
-\item{input.data}{Spatial object of an ecosystem or species distribution.
+\item{input_data}{Spatial object of an ecosystem or species distribution.
 Please use a CRS with units measured in metres.}
+
+\item{names_from}{name of the column containing ecosystem names.
+If missing all features will be analysed together. Only needed for vector data.}
 }
 \value{
-An object of class SpatVect representing the EOO of
-\code{input.data}. Also inherits its CRS.
+An object of class sf representing the EOO of
+\code{input_data}, or a list of sf objects if multiple ecosystems were input.
+Also inherits its CRS from input_data.
 }
 \description{
 \code{makeEOO} is a generic function that creates a  minimum convex polygon
-enclosing all occurrences of the provided spatial data. If the input provided
+enclosing all occurrences of the ecosystems provided in the input data. If the input provided
 is a raster layer, the points are taken from a buffer that has the radius of
 half of the shorter edge of the pixel around the centroid.
 }
 \examples{
-library(terra)
-crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
-r1 <- rast(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
-ext(r1) <- c(0, 6100, 0, 8700)
-EOO.polygon <- makeEOO(r1)
+if (requireNamespace("terra", quietly = TRUE)) {
+  ok <- try({
+     m <- matrix(sample(1:4, 500, replace = TRUE, prob = c(4,1,1,6)), nrow=25, ncol=20)
+     r1 <- terra::rast(m, crs = "+proj=utm +zone=55 +south +datum=WGS84 +units=m +no_defs")
+     EOO.polygon <- makeEOO(r1)
+  }, silent = TRUE)
+}
 }
 \references{
-Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
-Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
-List of Ecosystems Categories and Criteria, Version 1.0. Gland,
-Switzerland: IUCN. ix + 94pp. Available at the following web site:
-\url{https://iucnrle.org/}
+IUCN 2024. Guidelines for the application of IUCN Red List of
+Ecosystems Categories and Criteria, Version 2.0. Keith, D.A., Ferrer-Paris,
+J.R., Ghoraba, S.M.M., Henriksen, S., Monyeki, M., Murray, N.J., Nicholson,
+E., Rowland, J., Skowno, A., Slingsby, J.A., Storeng, A.B., Valderrábano, M.
+& Zager, I. (Eds.) Gland, Switzerland: IUCN. ix + 94pp.
 }
 \seealso{
 Other EOO functions: 
-\code{\link{getAreaEOO}()}
+\code{\link{getAreaEOO}()},
+\code{\link{getEOO}()}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee

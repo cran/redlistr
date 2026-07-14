@@ -41,23 +41,20 @@ decline.stats <- getDeclineStats(a.r1, a.r2, year.t1 = 1990, year.t2 = 2012,
                                  methods = c('ARD', 'ARC'))
 }
 \references{
-Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
-Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
-List of Ecosystems Categories and Criteria, Version 1.0. Gland,
-Switzerland: IUCN. ix + 94pp. Available at the following web site:
-\url{https://iucnrle.org/}
+IUCN 2024. Guidelines for the application of IUCN Red List of
+Ecosystems Categories and Criteria, Version 2.0. Keith, D.A., Ferrer-Paris,
+J.R., Ghoraba, S.M.M., Henriksen, S., Monyeki, M., Murray, N.J., Nicholson,
+E., Rowland, J., Skowno, A., Slingsby, J.A., Storeng, A.B., Valderrábano, M.
+& Zager, I. (Eds.) Gland, Switzerland: IUCN. ix + 94pp.
 Puyravaud, J.-P. 2003. Standardizing the calculation of the
 annual rate of deforestation. Forest Ecology and Management, 177, 593-596.
 }
 \seealso{
 Other Change functions: 
-\code{\link{getArea.RasterLayer}()},
-\code{\link{getArea.SpatRaster}()},
-\code{\link{getArea.SpatVect}()},
-\code{\link{getArea.SpatialPolygons}()},
-\code{\link{getArea.sf}()},
-\code{\link{getAreaLoss}()},
-\code{\link{getArea}()}
+\code{\link{declineForecast}()},
+\code{\link{getArea}()},
+\code{\link{getAreaChange}()},
+\code{\link{getAreaTrend}()}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee

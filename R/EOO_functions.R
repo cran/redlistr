@@ -1,93 +1,170 @@
 #' Creates Extent of occurrence (EOO) Polygon
 #'
 #' `makeEOO` is a generic function that creates a  minimum convex polygon
-#' enclosing all occurrences of the provided spatial data. If the input provided
+#' enclosing all occurrences of the ecosystems provided in the input data. If the input provided
 #' is a raster layer, the points are taken from a buffer that has the radius of
 #' half of the shorter edge of the pixel around the centroid.
-#' @param input.data Spatial object of an ecosystem or species distribution.
+#' @param input_data Spatial object of an ecosystem or species distribution.
 #'   Please use a CRS with units measured in metres.
-#' @return An object of class SpatVect representing the EOO of
-#'   `input.data`. Also inherits its CRS.
+#' @param names_from name of the column containing ecosystem names.
+#' If missing all features will be analysed together. Only needed for vector data.
+#' @return An object of class sf representing the EOO of
+#'   `input_data`, or a list of sf objects if multiple ecosystems were input.
+#'   Also inherits its CRS from input_data.
 #' @author Nicholas Murray \email{murr.nick@@gmail.com}, Calvin Lee
 #'   \email{calvinkflee@@gmail.com}
 #' @family EOO functions
-#' @references Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
-#'   Rodriguez, J.P. (eds.) 2016. Guidelines for the application of IUCN Red
-#'   List of Ecosystems Categories and Criteria, Version 1.0. Gland,
-#'   Switzerland: IUCN. ix + 94pp. Available at the following web site:
-#'   <https://iucnrle.org/>
+#' @references IUCN 2024. Guidelines for the application of IUCN Red List of
+#'   Ecosystems Categories and Criteria, Version 2.0. Keith, D.A., Ferrer-Paris,
+#'   J.R., Ghoraba, S.M.M., Henriksen, S., Monyeki, M., Murray, N.J., Nicholson,
+#'   E., Rowland, J., Skowno, A., Slingsby, J.A., Storeng, A.B., Valderrábano, M.
+#'   & Zager, I. (Eds.) Gland, Switzerland: IUCN. ix + 94pp.
 #' @examples
-#' library(terra)
-#' crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
-#' r1 <- rast(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
-#' ext(r1) <- c(0, 6100, 0, 8700)
-#' EOO.polygon <- makeEOO(r1)
+#' if (requireNamespace("terra", quietly = TRUE)) {
+#'   ok <- try({
+#'      m <- matrix(sample(1:4, 500, replace = TRUE, prob = c(4,1,1,6)), nrow=25, ncol=20)
+#'      r1 <- terra::rast(m, crs = "+proj=utm +zone=55 +south +datum=WGS84 +units=m +no_defs")
+#'      EOO.polygon <- makeEOO(r1)
+#'   }, silent = TRUE)
+#' }
 #' @export
-#' @import sp
-#' @import raster
-#' @import terra
 
-makeEOO <- function(input.data) UseMethod("makeEOO", input.data)
+makeEOO <- function(input_data, names_from) UseMethod("makeEOO", input_data)
 
+#' @method makeEOO SpatRaster
 #' @export
-makeEOO.RasterLayer <- function(input.data){
-  input_rast <- rast(input.data)
-  EOO.points <- as.points(input_rast)
-  EOO.buffer <- buffer(EOO.points, min(res(input_rast)) / 2)
-  EOO.polygon <- convHull(EOO.buffer)
+makeEOO.SpatRaster <- function(input_data, names_from = NA){
+  EOO.points <- terra::as.points(input_data)
+  input.split <- terra::split(EOO.points, names(EOO.points))
+  EOO.buffer <- lapply(input.split, buffer, width = min(terra::res(input_data)) / 2)
+  EOO.polygon <- lapply(EOO.buffer, terra::hull)
+
   return(EOO.polygon)
 }
 
+#' @method makeEOO sf
 #' @export
-makeEOO.SpatRaster <- function(input.data){
-  EOO.points <- as.points(input.data)
-  EOO.buffer <- buffer(EOO.points, min(res(input.data)) / 2)
-  EOO.polygon <- convHull(EOO.buffer)
-  return(EOO.polygon)
+makeEOO.sf <- function(input_data, names_from = NA){
+  # deal with any invalid geometries early.
+  if(any(!sf::st_is_valid(input_data))){
+    input_data <- sf::st_make_valid(input_data)
+  }
+
+  names_from <- dplyr::coalesce(names_from, "ecosystem_name")
+  if (!any(colnames(input_data) %in% names_from)) {
+    input_data <- input_data |> dplyr::mutate(ecosystem_name = "unnamed ecosystem type")
+  }
+ input.split <- split(input_data, sf::st_drop_geometry(input_data[names_from]))
+ EOO.polygon <- input.split |> lapply(sf::st_union) |> lapply(sf::st_convex_hull) |> lapply(sf::st_sf)
+return(EOO.polygon)
 }
 
+#' @method makeEOO SpatVector
 #' @export
-makeEOO.SpatialPoints <- function(input.data){
-  input_vect <- vect(input.data)
-  EOO.polygon <- convHull(input_vect)
-  return(EOO.polygon)
+makeEOO.SpatVector <- function(input_data, names_from = NA){
+input_data <- st_sf(input_data)
+return(makeEOO.sf(input_data, names_from))
 }
 
-#' @export
-makeEOO.SpatialPolygons <- function(input.data){
-  input_vect <- vect(input.data)
-  EOO.polygon <- convHull(input_vect)
-  return(EOO.polygon)
-}
-
-#' @export
-makeEOO.SpatVector <- function(input.data){
-  EOO.polygon <- convHull(input.data)
-  return(EOO.polygon)
-}
-
-#' Calculates area of the created EOO polygon.
+#' Calculates area of the created EOO polygon and returns a summary object with useful info.
 #'
-#' `getAreaEOO` calculates the area of the EOO polygon generated from
-#' `makeEOO` the provided data
-#' @param EOO.polygon An object of class SpatVect, usually the output
-#'   from `makeEOO`.
-#' @param unit Character. Output unit of area. One of "m", "km", or "ha"
-#' @return The area of the `EOO.polygon` in km2
+#' `getEOO` calculates the area of the EOO polygon generated from
+#' `makeEOO` the provided data and returns an EOO class object or a list of these with
+#' defined summary and plot functions available.
+#' @param input_data Spatial object of an ecosystem or species distribution.
+#'   Please use a CRS with units measured in metres.
+#' @param names_from name of the column containing ecosystem names.
+#' If missing all features will be analysed together. Only needed for vector data.
+#' @return An object of type EOO or a list of EOO objects that store the
+#' EOO polygon, its area, and its input_data
 #' @author Nicholas Murray \email{murr.nick@@gmail.com}, Calvin Lee
 #'   \email{calvinkflee@@gmail.com}
 #' @family EOO functions
 #' @examples
-#' library(terra)
-#' crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
-#' r1 <- rast(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
-#' ext(r1) <- c(0, 6100, 0, 8700)
-#' EOO.polygon <- makeEOO(r1)
-#' EOO.area <- getAreaEOO(EOO.polygon)
+#' if (requireNamespace("terra", quietly = TRUE)) {
+#'   ok <- try({
+#'     m <- matrix(sample(1:4, 500, replace = TRUE, prob = c(4,1,1,6)), nrow=25, ncol=20)
+#'      r1 <- terra::rast(m, crs = "+proj=utm +zone=55 +south +datum=WGS84 +units=m +no_defs")
+#'     EOO <- getEOO(r1)
+#'   }, silent = TRUE)
+#' }
 #' @export
 #' @import terra
+#' @import sf
+#' @import units
 
-getAreaEOO <- function(EOO.polygon, unit = "km"){
-  EOO.area <- expanse(EOO.polygon, unit)
-  return(EOO.area)
+getEOO <- function(input_data, names_from = NA) UseMethod("getEOO", input_data)
+
+#' @method getEOO SpatRaster
+#' @export
+getEOO.SpatRaster <- function(input_data, names_from = NA){
+
+values <- sort(unique(terra::values(input_data)))
+  binary_rasters <- lapply(values, function(v) {
+    as.numeric(input_data == v)
+  }) |> stats::setNames(paste0(names(input_data), "_value_", values))
+
+  EOO.polygon <- makeEOO(input_data) |> lapply(sf::st_as_sf)
+  EOO.area <- lapply(EOO.polygon, sf::st_area) |> lapply(units::set_units, "km^2")
+
+  EOO_list <- lapply(1:length(binary_rasters),
+                         function(x) new("EOO",
+                                         name = names(binary_rasters)[[x]],
+                                         pol = EOO.polygon[[x]],
+                                         EOO = as.numeric(EOO.area[[x]]),
+                                         unit = as.character(units(EOO.area[[x]])),
+                                         input = binary_rasters[[x]]))
+
+  if(length(EOO_list) == 1) return(EOO_list[[1]]) else return(EOO_list)
+}
+
+#' @method getEOO sf
+#' @export
+getEOO.sf <- function(input_data, names_from = NA){
+
+  # deal with any invalid geometries early.
+  if(any(!sf::st_is_valid(input_data))){
+    input_data <- sf::st_make_valid(input_data)
+  }
+
+  names_from <- dplyr::coalesce(names_from, "ecosystem_name")
+  if (!any(colnames(input_data) %in% names_from)) {                 # check for ecosystem names
+    input_data <- input_data |> dplyr::mutate(ecosystem_name = "unnamed ecosystem type")  #put new name label if not present
+  }
+  input_split <- input_data |> split(sf::st_drop_geometry(input_data[names_from]))
+
+  EOO.polygon <- makeEOO(input_data, names_from)
+  EOO.area <- lapply(EOO.polygon, sf::st_area) |> lapply(units::set_units, "km^2")
+
+  EOO_list <- lapply(1:length(input_split),
+                     function(x) new("EOO",
+                                     name = names(input_split)[[x]],
+                                     pol = EOO.polygon[[x]],
+                                     EOO = as.numeric(EOO.area[[x]]),
+                                     unit = as.character(units(EOO.area[[x]])),
+                                     input = input_split[[x]]))
+  names(EOO_list) <- names(input_split)
+
+  if(length(EOO_list) == 1) return(EOO_list[[1]]) else return(EOO_list)
+}
+
+#' @method getEOO SpatVector
+#' @export
+getEOO.SpatVector <- function(input_data, names_from = NA){
+  input_data <- sf::st_sf(input_data)
+  return(getEOO.sf(input_data, names_from))
+}
+
+
+
+#' Extracts the area from an EOO polygon
+#'
+#' `getEOOarea` wrapper that extracts the area slot of the EOO input
+#' @param EOO an object of class EOO
+#' @return an integer
+#' @family EOO functions
+#' @export
+
+getAreaEOO <- function(EOO){
+  return(EOO@EOO)
 }

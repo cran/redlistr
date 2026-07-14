@@ -4,23 +4,41 @@
 \alias{getAOO}
 \title{Compute Area of Occupancy (AOO)}
 \usage{
-getAOO(input.data, grid.size, min.percent.rule = FALSE, percent = 1)
+getAOO(
+  input_data,
+  cell_size = 10000,
+  names_from = NA,
+  bottom_1pct_rule = TRUE,
+  percent = 1,
+  jitter = 150,
+  n_jitter = 35
+)
 }
 \arguments{
-\item{input.data}{Spatial object of an ecosystem or species distribution.
+\item{input_data}{Spatial object (sf or SpatRaster) of an ecosystem or species distribution.
 Please use a CRS with units measured in metres.}
 
-\item{grid.size}{A number specifying the width of the desired grid square (in
+\item{cell_size}{A number specifying the width of the desired grid square (in
 same units as your coordinate reference system)}
 
-\item{min.percent.rule}{Logical. If \code{TRUE}, a minimum area threshold
-must be passed before a grid is counted as an AOO grid.}
+\item{names_from}{the name of the column containing ecosystem labels}
+
+\item{bottom_1pct_rule}{Logical. If \code{TRUE}, grid cells containing the least
+ecosystem area are dropped up to 1\% of the total distribution.}
 
 \item{percent}{Numeric. The minimum percent to be applied as a threshold for
-the \code{min.percent.rule}}
+the \code{bottom_1pct_rule}}
+
+\item{jitter}{Integer. 0 = do not jitter, 1 = force jitter, another number
+indicates conditional jitter, the number of AOO cells under which to jitter,
+and over which not to jitter the grid.}
+
+\item{n_jitter}{the number of grids to test for ecosystems near
+the AOO thresholds. Ignored if jitter = FALSE.}
 }
 \value{
-The number of grid cells occupied by the ecosystem or species
+an object of class AOOgrid or a list of AOOgrid objects. Ecosystems that received
+an AOO of 60 cells or fewer on a first pass are run with a jittered grid with n specified by n_jitter
 }
 \description{
 \code{getAOO} determines the number of area of occupancy (AOO) grid cells
@@ -28,12 +46,6 @@ occupied by a species or ecosystem. It includes capability for specifying
 whether at least one percent of the grid cell needs to be occupied before it
 is counted in the AOO. This functionality is important for assessing the IUCN
 Red List of Ecosystems Criteria B.
-}
-\examples{
-crs.UTM55S <- '+proj=utm +zone=55 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs'
-r1 <- raster(ifelse((volcano<130), NA, 1), crs = crs.UTM55S)
-extent(r1) <- extent(0, 6100, 0, 8700)
-AOO <- getAOO(r1, 1000, min.percent.rule = TRUE, percent = 1)
 }
 \references{
 Bland, L.M., Keith, D.A., Miller, R.M., Murray, N.J. and
@@ -45,11 +57,12 @@ Switzerland: IUCN. ix + 94pp. Available at the following web site:
 \seealso{
 Other AOO functions: 
 \code{\link{createGrid}()},
-\code{\link{getAOOSilent}()},
-\code{\link{makeAOOGrid}()}
+\code{\link{jplot}()},
+\code{\link{makeAOOGrid}()},
+\code{\link{top_pct}()}
 }
 \author{
 Nicholas Murray \email{murr.nick@gmail.com}, Calvin Lee
-\email{calvinkflee@gmail.com}
+\email{calvinkflee@gmail.com}, Aniko B. Toth \email{anikobtoth@gmail.com}
 }
 \concept{AOO functions}
